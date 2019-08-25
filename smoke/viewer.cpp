@@ -1,3 +1,4 @@
+#define GL_SILENCE_DEPRECATION
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
@@ -412,7 +413,7 @@ void Viewer::gen_ray_templ(int edgelen)
 
 		if ((tx<=ty)&&(tx<=tz)) {
 			_ray_templ[i][0] = _ray_templ[i-1][0] + xinc;
-			x =+ xinc;
+			x += xinc;
 			fx = x;
 
 			if (ALMOST_EQUAL(ty,tx)) {

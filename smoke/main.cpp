@@ -1,3 +1,4 @@
+#define GL_SILENCE_DEPRECATION
 #include <stdlib.h>
 #include <assert.h>
 #include <cstring>
@@ -9,7 +10,6 @@
 #include "fluid.h"
 #include "viewer.h"
 #include "genfunc.h"
-#undef main
 
 SDL_Window* screen = NULL;
 SDL_Thread* simthread = NULL;
@@ -109,7 +109,7 @@ int simulate(void* bla)
 	return 0;
 }
 
-SDL_UserEvent nextframe = { SDL_USEREVENT, 0, NULL, NULL};
+SDL_UserEvent nextframe = { SDL_USEREVENT, 0, 0, 0};
 
 Uint32 timer_proc(Uint32 interval, void* bla)
 {
