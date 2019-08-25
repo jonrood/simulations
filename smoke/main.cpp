@@ -2,16 +2,16 @@
 #include <assert.h>
 #include <cstring>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
-#include <SDL/SDL_thread.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_thread.h>
 
 #include "fluid.h"
 #include "viewer.h"
 #include "genfunc.h"
 #undef main
 
-SDL_Surface* screen = NULL;
+SDL_Window* screen = NULL;
 SDL_Thread* simthread = NULL;
 
 Fluid* fluid = NULL;
@@ -54,12 +54,13 @@ bool init(void)
         //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	screen = SDL_SetVideoMode(500, 500, 32, SDL_OPENGL | SDL_RESIZABLE);
+        screen = SDL_CreateWindow("Smoke", 0, 0, 640, 480, SDL_WINDOW_OPENGL);
 	if ( screen == NULL ) {
 		sprintf(str, "Unable to set video: %s\n", SDL_GetError());
 		error(str);
 		return false;
 	}
+        SDL_GLContext Context = SDL_GL_CreateContext(screen);
 
 	fluid = new Fluid();
 	fluid->diffusion = 0.00001f;
@@ -68,7 +69,7 @@ bool init(void)
 	fluid->vc_eps    = 2.0f;
 
 	viewer = new Viewer();
-	viewer->viewport(screen->w, screen->h);
+	viewer->viewport(640, 480);
 
 	gfparams = randfloats(256);
 
@@ -165,24 +166,25 @@ int EventLoop()
 					quitting = true;
 					return 0;
 
-				case SDL_VIDEORESIZE:
-					screen = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_OPENGL | SDL_RESIZABLE);
-					viewer->viewport(screen->w, screen->h);
+			/*	case SDL_WINDOWEVENT_RESIZED:
+					screen = SDL_SetWindowSize(event->window.windowID, event->window.data1, event->window.data2);
+					viewer->viewport(event->window.data1, event->window.data2);
 					redraw = true;
+					break;*/
+				case SDL_MOUSEWHEEL:
+					if (event.wheel.y > 0){
+						viewer->anchor(0,0);
+						viewer->dolly(-480/10);
+						redraw = true;
+					} else if (event.wheel.y < 0){
+						viewer->anchor(0,0);
+						viewer->dolly(480/10);
+						redraw = true;
+					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					switch (event.button.button)
 					{
-						case SDL_BUTTON_WHEELUP:
-							viewer->anchor(0,0);
-							viewer->dolly(-screen->h/10);
-							redraw = true;
-							break;
-						case SDL_BUTTON_WHEELDOWN:
-							viewer->anchor(0,0);
-							viewer->dolly(screen->h/10);
-							redraw = true;
-							break;
 						case SDL_BUTTON_RIGHT:
 							fogging = !fogging;
 							break;
@@ -225,7 +227,7 @@ int EventLoop()
 		if (redraw)
 		{
 			viewer->draw();
-			SDL_GL_SwapBuffers();
+		        SDL_GL_SwapWindow(screen);
 			redraw = false;
 			frames++;
 		}
@@ -239,7 +241,7 @@ int main(int argc, char* argv[])
 	SDL_TimerID fpstimer;
 
 	if (!init()) return 1;
-	simthread = SDL_CreateThread(simulate, NULL);
+	simthread = SDL_CreateThread(simulate, NULL, NULL);
 	fpstimer = SDL_AddTimer(1000, showfps, NULL);
 	EventLoop();
 	SDL_RemoveTimer(fpstimer);
