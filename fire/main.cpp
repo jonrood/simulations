@@ -1,13 +1,13 @@
+#define GL_SILENCE_DEPRECATION
 #include <stdlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_thread.h>
 
 #include "fluid.h"
 #include "viewer.h"
 #include "genfunc.h"
-#undef main
 
-SDL_Surface* screen = NULL;
+SDL_Window* screen = NULL;
 SDL_Thread* simthread = NULL;
 
 Fluid* fluid = NULL;
@@ -51,12 +51,13 @@ bool init(void)
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-    screen = SDL_SetVideoMode(500, 500, 32, SDL_OPENGL | SDL_RESIZABLE);
+        screen = SDL_CreateWindow("Fire", 0, 0, 640, 480, SDL_WINDOW_OPENGL);
 	if ( screen == NULL ) {
         sprintf(str, "Unable to set video: %s\n", SDL_GetError());
 		error(str);
         return false;
 	}
+        SDL_GLContext Context = SDL_GL_CreateContext(screen);
 
 	/* Fluid */
 
@@ -72,7 +73,7 @@ bool init(void)
 	/* Viewer */
 
 	viewer = new Viewer();
-	viewer->viewport(screen->w, screen->h);
+	viewer->viewport(640, 480);
 
 	return true;
 }
@@ -108,7 +109,7 @@ int simulate(void* bla)
 	return 0;
 }
 
-SDL_UserEvent nextframe = { SDL_USEREVENT, 0, NULL, NULL};
+SDL_UserEvent nextframe = { SDL_USEREVENT, 0, 0, 0};
 Uint32 timer_proc(Uint32 interval, void* bla)
 {
 	/*if (!paused)
@@ -171,24 +172,25 @@ int EventLoop(FILE* fp)
 					quitting = true;
 					return 0;
 
-				case SDL_VIDEORESIZE:
-					screen = SDL_SetVideoMode(event.resize.w, event.resize.h, 32, SDL_OPENGL | SDL_RESIZABLE);
-					viewer->viewport(screen->w, screen->h);
+			/*	case SDL_WINDOWEVENT_RESIZED:
+					screen = SDL_SetWindowSize(event->window.windowID, event->window.data1, event->window.data2);
+					viewer->viewport(event->window.data1, event->window.data2);
 					redraw = true;
+					break;*/
+				case SDL_MOUSEWHEEL:
+					if (event.wheel.y > 0){
+						viewer->anchor(0,0);
+						viewer->dolly(-480/10);
+						redraw = true;
+					} else if (event.wheel.y < 0){
+						viewer->anchor(0,0);
+						viewer->dolly(480/10);
+						redraw = true;
+					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					switch (event.button.button)
 					{
-						case SDL_BUTTON_WHEELUP:
-							viewer->anchor(0,0);
-							viewer->dolly(-screen->h/10);
-							redraw = true;
-							break;
-						case SDL_BUTTON_WHEELDOWN:
-							viewer->anchor(0,0);
-							viewer->dolly(screen->h/10);
-							redraw = true;
-							break;
 						default:
 							viewer->anchor(event.button.x, event.button.y);
 							break;
@@ -229,7 +231,7 @@ int EventLoop(FILE* fp)
 		if (redraw)
 		{
 			viewer->draw();
-			SDL_GL_SwapBuffers();
+			SDL_GL_SwapWindow(screen);
 			redraw = false;
 			frames++;
 		}
@@ -269,7 +271,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (mode == SIMULATE)
-		simthread = SDL_CreateThread(simulate, NULL);
+		simthread = SDL_CreateThread(simulate, NULL, NULL);
 
 	if (mode == PLAY)
 		playtimer = SDL_AddTimer(1000/20, timer_proc, NULL);

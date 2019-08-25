@@ -1,10 +1,16 @@
-CPPFLAGS = -O3 -framework OpenGL -framework SDL -I/Library/Frameworks/SDL.framework/Headers -F/Library/Frameworks
+FLAGS = -O3 -I/Library/Frameworks/SDL2.framework/Headers
+LINKFLAGS = -O3 -framework OpenGL -framework SDL2 -F/Library/Frameworks
 
-all: fluid.o main.o genfunc.o viewer.o trackball.o FragmentUtils.o spectrum.o
-	g++ -o fluid main.o fluid.o genfunc.o viewer.o trackball.o FragmentUtils.o spectrum.o $(CPPFLAGS)
+OBJS = fluid.o main.o genfunc.o viewer.o trackball.o FragmentUtils.o spectrum.o 
 
-genfunctest: genfunctest.o genfunc.o
-	g++ -o genfunctest genfunctest.o genfunc.o $(CPPFLAGS)
+%.o: %.cpp
+	g++ -g -o $@ -c $< $(FLAGS)
+
+%.o: %.c
+	gcc -g -o $@ -c $< $(FLAGS)
+
+all: $(OBJS)
+	g++ -o fluid $(OBJS) $(LINKFLAGS)
 
 clean:
-	rm *.o fluid
+	rm -f $(OBJS) fluid

@@ -5,8 +5,9 @@
 #include <cstring>
 #include <algorithm>
 #define GL_GLEXT_PROTOTYPES
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <OpenGL/glu.h>
 
 #include "viewer.h"
 extern "C" {
@@ -86,7 +87,6 @@ void Viewer::init_GL(void)
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S,GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T,GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R,GL_CLAMP);
-
 }
 
 void Viewer::draw(void)

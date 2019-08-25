@@ -1,12 +1,14 @@
+#define GL_SILENCE_DEPRECATION
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 
 #include <algorithm>
 
-#include <SDL/SDL.h>
 #define GL_GLEXT_PROTOTYPES
-#include <SDL/SDL_opengl.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <OpenGL/glu.h>
 
 #include "viewer.h"
 extern "C" {
@@ -470,7 +472,7 @@ void Viewer::gen_ray_templ(int edgelen)
 
 		if ((tx<=ty)&&(tx<=tz)) {
 			_ray_templ[i][0] = _ray_templ[i-1][0] + xinc;
-			x =+ xinc;
+			x += xinc;
 			fx = x;
 
 			if (ALMOST_EQUAL(ty,tx)) {
