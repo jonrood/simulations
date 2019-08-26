@@ -1,10 +1,12 @@
+#define GL_SILENCE_DEPRECATION
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include <algorithm>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #define GL_GLEXT_PROTOTYPES
-#include <SDL/SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
+#include <OpenGL/glu.h>
 
 #include "viewer.h"
 extern "C" {
@@ -392,6 +394,7 @@ bool Viewer::open(char* filename)
 	fread(&_nframes, sizeof(int), 1, _fp);
 	printf("Number of frames: %d\n", _nframes);
 	_cur_frame = 0;
+	return true;
 }
 
 void Viewer::load_frame(void)
@@ -472,7 +475,7 @@ void Viewer::gen_ray_templ(int edgelen)
 
 		if ((tx<=ty)&&(tx<=tz)) {
 			_ray_templ[i][0] = _ray_templ[i-1][0] + xinc;
-			x =+ xinc;
+			x += xinc;
 			fx = x;
 
 			if (ALMOST_EQUAL(ty,tx)) {

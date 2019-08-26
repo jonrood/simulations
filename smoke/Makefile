@@ -11,7 +11,7 @@ OBJS = main.o fluid.o viewer.o trackball.o genfunc.o
 	gcc -g -o $@ -c $< $(FLAGS)
 
 all: $(OBJS)
-	g++ -o fluid $(OBJS) $(LINKFLAGS) 
+	g++ -o smoke $(OBJS) $(LINKFLAGS) 
 
 clean:
-	rm -f $(OBJS) fluid
+	rm -f $(OBJS) smoke

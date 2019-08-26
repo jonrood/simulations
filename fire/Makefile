@@ -10,7 +10,7 @@ OBJS = fluid.o main.o genfunc.o viewer.o trackball.o FragmentUtils.o spectrum.o
 	gcc -g -o $@ -c $< $(FLAGS)
 
 all: $(OBJS)
-	g++ -o fluid $(OBJS) $(LINKFLAGS)
+	g++ -o fire $(OBJS) $(LINKFLAGS)
 
 clean:
-	rm -f $(OBJS) fluid
+	rm -f $(OBJS) fire
