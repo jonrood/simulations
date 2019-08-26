@@ -393,6 +393,7 @@ bool Viewer::open(char* filename)
 	fread(&_nframes, sizeof(int), 1, _fp);
 	printf("Number of frames: %d\n", _nframes);
 	_cur_frame = 0;
+	return true;
 }
 
 void Viewer::load_frame(void)

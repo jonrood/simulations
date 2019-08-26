@@ -35,13 +35,14 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <string>
 
 /* A colour system is defined by the CIE x and y coordinates of
    its three primary illuminants and the x and y coordinates of
    the white point. */
 
 struct colourSystem {
-    char *name;     	    	    /* Colour system name */
+    std::string name;  	    	    /* Colour system name */
     double xRed, yRed,	    	    /* Red x, y */
            xGreen, yGreen,  	    /* Green x, y */
            xBlue, yBlue,    	    /* Blue x, y */
