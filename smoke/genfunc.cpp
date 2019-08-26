@@ -30,9 +30,10 @@ float genfunc(int x, int y, int sx, int sy, float t, float* p)
 	f=0;
 	for (i=0; i<12; i++)
 	{
-		f += (1.0f + sin(((float)x)/sx*PI2*(p[pi++]+1.0f)+p[pi++]*PI2 + p[pi++]*t)*
-		sin(((float)y)/sy*PI2*(p[pi++]+1.0f)+p[pi++]*PI2 + p[pi++]*t))
-		* (1.0f + sin((p[pi++]+0.5f)*t + p[pi++]*PI2)) * 0.25f;
+		pi++;
+		f += (1.0f + sin(((float)x)/sx*PI2*(p[pi]+1.0f)+p[pi+1]*PI2 + p[pi+2]*t)*
+		sin(((float)y)/sy*PI2*(p[pi+3]+1.0f)+p[pi+4]*PI2 + p[pi+5]*t))
+		* (1.0f + sin((p[pi+6]+0.5f)*t + p[pi+7]*PI2)) * 0.25f;
 	}
 	f *= 1.0f/i;
 

@@ -47,7 +47,7 @@ Viewer::Viewer()
 	_dist = 5.0f;
 	_texture_data = NULL;
 
-	_draw_cube = true;
+	_draw_cube = false;
 	_draw_slice_outline = false;
 
 	init_GL();

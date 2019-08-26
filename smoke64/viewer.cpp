@@ -48,7 +48,7 @@ Viewer::Viewer()
 	_fp = NULL;
 	_texture_data = NULL;
 
-	_draw_cube = true;
+	_draw_cube = false;
 	_draw_slice_outline = false;
 	_dispstring = NULL;
 
