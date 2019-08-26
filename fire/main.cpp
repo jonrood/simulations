@@ -79,8 +79,7 @@ int simulate(void* bla)
 
 	while (!quitting)
 	{
-		//if (!paused && !update) {
-		if (1) {
+		if (!paused) {
 			for (int i=6; i<26; i++)
 			{
 				for (int j=6; j<26; j++)
@@ -145,12 +144,6 @@ int EventLoop()
 							return 0;
 						case SDLK_c:
 							viewer->_draw_cube = !viewer->_draw_cube;
-							break;
-						case SDLK_i:
-							if (viewer->_dispstring != NULL)
-								viewer->_dispstring = NULL;
-							else
-								viewer->_dispstring = infostring;
 							break;
 						case SDLK_s:
 							viewer->_draw_slice_outline = !viewer->_draw_slice_outline;

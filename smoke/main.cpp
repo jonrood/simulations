@@ -85,7 +85,7 @@ int simulate(void* bla)
 
 	while (!quitting)
 	{
-		if (1) {
+		if (!paused) {
 			const int xpos = 27;
 			const int ypos = 20;
 			for (int i=0; i<4; i++)
@@ -93,9 +93,10 @@ int simulate(void* bla)
 				for (int j=0; j<4; j++)
 				{
 					f = genfunc(i,j,8,8,t,gfparams);
-					if (1)
+					if (fogging) {
 						fluid->d[_I(xpos,i+ypos,j+14)] = 1.0f;
 						fluid->u[_I(xpos,i+ypos,j+14)] = -2.0f-f;
+					}
 				}
 			}
 
@@ -139,8 +140,6 @@ int EventLoop()
 	SDL_Event event;
 	unsigned int ts;
 
-	paused = false;
-
 	while (1) {
 		//ts = SDL_GetTicks();
 		while (SDL_PollEvent(&event)) {
@@ -155,6 +154,9 @@ int EventLoop()
 							break;
 						case SDLK_s:
 							viewer->_draw_slice_outline = !viewer->_draw_slice_outline;
+							break;
+						case SDLK_f:
+							fogging = !fogging;
 							break;
 						case SDLK_SPACE:
 							paused = !paused;
@@ -185,17 +187,10 @@ int EventLoop()
 				case SDL_MOUSEBUTTONDOWN:
 					switch (event.button.button)
 					{
-						case SDL_BUTTON_RIGHT:
-							fogging = !fogging;
-							break;
 						default:
 							viewer->anchor(event.button.x, event.button.y);
 							break;
 					}
-					break;
-				case SDL_MOUSEBUTTONUP:
-					if (event.button.button == SDL_BUTTON_RIGHT)
-						fogging = !fogging;
 					break;
 				case SDL_MOUSEMOTION:
 					switch (event.motion.state) {

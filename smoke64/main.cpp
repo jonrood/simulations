@@ -20,7 +20,7 @@ float fps = 0.0f, sfps = 0.0f;
 float t = 0;
 float* gfparams;
 
-bool paused = false, quitting = false, redraw = true, update = true, wasupdate = false, fogging = true;
+bool paused = false, quitting = false, redraw = true, update = true, wasupdate = false, fogging = false;
 
 int EventLoop();
 
@@ -78,16 +78,17 @@ int simulate(void* bla)
 
 	while (!quitting)
 	{
-		//if (!paused && !update) {
-		if (1) {
+		if (!paused) {
 			/*const int xpos = 27;
 			const int ypos = 20;
 			for (int i=0; i<4; i++)
 			{
 				for (int j=0; j<4; j++)
 				{
-					fluid->d[_I(xpos,i+ypos,j+14)] = 1.0f;
-					fluid->u[_I(xpos,i+ypos,j+14)] = -2.0f;
+					if (fogging) {
+						fluid->d[_I(xpos,i+ypos,j+14)] = 1.0f;
+						fluid->u[_I(xpos,i+ypos,j+14)] = -2.0f;
+					}
 				}
 			}*/
 
@@ -98,8 +99,10 @@ int simulate(void* bla)
 				for (int j=0; j<8; j++)
 				{
 					f = genfunc(i,j,8,8,t,gfparams);
-					fluid->d[_I(i+28,ypos,j+28)] = d;
-					fluid->v[_I(i+28,ypos,j+28)] = -(1.0f + 2.0f*f);
+					if (fogging) {
+						fluid->d[_I(i+28,ypos,j+28)] = d;
+						fluid->v[_I(i+28,ypos,j+28)] = -(1.0f + 2.0f*f);
+					}
 				}
 			}*/
 
@@ -111,9 +114,11 @@ int simulate(void* bla)
 				for (int j=0; j<8; j++)
 				{
 					f = genfunc(i,j,8,8,t,gfparams);
-					fluid->d[_I(xpos,i+ypos,j+28)] = d;
-					//fluid->u[_I(xpos,i+ypos,j+28)] = -(1.0f + 2.0f*f);
-					fluid->u[_I(xpos,i+ypos,j+28)] = -3.0f;
+					if (fogging) {
+						fluid->d[_I(xpos,i+ypos,j+28)] = d;
+						//fluid->u[_I(xpos,i+ypos,j+28)] = -(1.0f + 2.0f*f);
+						fluid->u[_I(xpos,i+ypos,j+28)] = -3.0f;
+					}
 				}
 			}
 
@@ -172,14 +177,11 @@ int EventLoop()
 						case SDLK_c:
 							viewer->_draw_cube = !viewer->_draw_cube;
 							break;
-						case SDLK_i:
-							if (viewer->_dispstring != NULL)
-								viewer->_dispstring = NULL;
-							else
-								viewer->_dispstring = infostring;
-							break;
 						case SDLK_s:
 							viewer->_draw_slice_outline = !viewer->_draw_slice_outline;
+							break;
+						case SDLK_f:
+							fogging = !fogging;
 							break;
 						case SDLK_SPACE:
 							paused = !paused;
@@ -210,9 +212,6 @@ int EventLoop()
 				case SDL_MOUSEBUTTONDOWN:
 					switch (event.button.button)
 					{
-						case SDL_BUTTON_RIGHT:
-							fogging = !fogging;
-							break;
 						default:
 							viewer->anchor(event.button.x, event.button.y);
 							break;
