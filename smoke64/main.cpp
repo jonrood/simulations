@@ -20,33 +20,25 @@ float fps = 0.0f, sfps = 0.0f;
 float t = 0;
 float* gfparams;
 
-enum Mode { SIMULATE, PLAY };
-Mode mode;
-
 bool paused = false, quitting = false, redraw = true, update = true, wasupdate = false, fogging = true;
 
-int EventLoop(FILE* fp);
+int EventLoop();
 
 void error(const char* str)
 {
-#ifdef WIN32
-	MessageBox(NULL, str, "Error", MB_OK | MB_ICONSTOP);
-#else
 	printf("Error: %s/n", str);
-#endif
 }
 
 bool init(void)
 {
 	char str[256];
 
-	/* SDL */
 	if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
-        sprintf(str, "Unable to init SDL: %s\n", SDL_GetError());
+        	sprintf(str, "Unable to init SDL: %s\n", SDL_GetError());
 		error(str);
-        return false;
-    }
-    atexit(SDL_Quit);
+        	return false;
+	}
+	atexit(SDL_Quit);
 
 	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
 	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
@@ -57,21 +49,17 @@ bool init(void)
 
         screen = SDL_CreateWindow("Smoke", 0, 0, 640, 480, SDL_WINDOW_OPENGL);
 	if ( screen == NULL ) {
-        sprintf(str, "Unable to set video: %s\n", SDL_GetError());
+        	sprintf(str, "Unable to set video: %s\n", SDL_GetError());
 		error(str);
-        return false;
+        	return false;
 	}
         SDL_GLContext Context = SDL_GL_CreateContext(screen);
-
-	/* Fluid */
 
 	fluid = new Fluid();
 	fluid->diffusion = 0.00001f;
 	fluid->viscosity = 0.000000f;
 	fluid->buoyancy  = 4.0f;
 	fluid->vc_eps    = 5.0f;
-
-	/* Viewer */
 
 	viewer = new Viewer();
 	viewer->viewport(640, 480);
@@ -140,6 +128,7 @@ int simulate(void* bla)
 }
 
 SDL_UserEvent nextframe = { SDL_USEREVENT, 0, 0, 0};
+
 Uint32 timer_proc(Uint32 interval, void* bla)
 {
 	/*if (!paused)
@@ -164,14 +153,14 @@ Uint32 showfps(Uint32 interval, void* bla)
 	return interval;
 }
 
-int EventLoop(FILE* fp)
+int EventLoop()
 {
-    SDL_Event event;
+	SDL_Event event;
 	unsigned int ts;
 
 	paused = false;
 
-    while (1) {
+	while (1) {
 		//ts = SDL_GetTicks();
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -248,86 +237,33 @@ int EventLoop(FILE* fp)
 			}
 		}
 
-		if (1)
-		{
-			if (mode == SIMULATE) {
-				viewer->frame_from_sim(fluid);
-				if (fp)
-					fluid->store(fp);
-			} else
-				viewer->load_frame();
+		if (1) {
+			viewer->frame_from_sim(fluid);
 			redraw = true;
 			update = wasupdate;
 			wasupdate = false;
 		}
 
-		if (redraw)
-		{
+		if (redraw) {
 			viewer->draw();
 			SDL_GL_SwapWindow(screen);
 			redraw = false;
 			frames++;
 		}
-    }
+	}
 
 	return 1;
 }
 
 int main(int argc, char* argv[])
 {
-	char str[256];
-	FILE *fp = NULL;
-	int h[3];
-	SDL_TimerID playtimer, fpstimer;
+	SDL_TimerID fpstimer;
 
-
-	if (!init())
-		return 1;
-
-	if (argc>1) {
-		if (!strcmp(argv[1],"-l") && (argc==3)) {
-			mode = PLAY;
-			if (!viewer->open(argv[2]))	{
-				error("Unable to load data file\n");
-				exit(1);
-			}
-		} else if (!strcmp(argv[1], "-w") && (argc==3)) {
-			mode = SIMULATE;
-			fp = fopen(argv[2], "wb");
-			fwrite(h, sizeof(int), 3, fp);
-		} else {
-			printf("Invalid command line argument. Usage: fluid [-l|-w <filename>]\n");
-			exit(1);
-		}
-	} else {
-		mode = SIMULATE;
-	}
-
-	if (mode == SIMULATE)
-		simthread = SDL_CreateThread(simulate, NULL, NULL);
-
-	if (mode == PLAY)
-		playtimer = SDL_AddTimer(1000/16, timer_proc, NULL);
-
+	if (!init()) return 1;
+	simthread = SDL_CreateThread(simulate, NULL, NULL);
 	fpstimer = SDL_AddTimer(1000, showfps, NULL);
-	EventLoop(fp);
+	EventLoop();
 	SDL_RemoveTimer(fpstimer);
-	if (mode==PLAY)
-		SDL_RemoveTimer(playtimer);
-
-	if (mode == SIMULATE) {
-		quitting = true;
-		SDL_WaitThread(simthread, NULL);
-	}
-
-	if (fp && (mode == SIMULATE))	{
-		int pos;
-		h[0] = h[1] = N+2;
-		h[2] = simframes;
-		pos = ftell(fp);
-		fseek(fp, 0, SEEK_SET);
-		fwrite(h, sizeof(int), 3, fp);
-		fclose(fp);
-		printf("%d frames written to file %s, %d kiB\n", simframes, argv[2], pos>>10);
-	}
+	quitting = true;
+	SDL_WaitThread(simthread, NULL);
 }
