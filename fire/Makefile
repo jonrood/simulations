@@ -4,10 +4,10 @@ LINKFLAGS = -O3 -framework OpenGL -framework SDL2 -F/Library/Frameworks
 OBJS = fluid.o main.o genfunc.o viewer.o trackball.o FragmentUtils.o spectrum.o 
 
 %.o: %.cpp
-	g++ -g -o $@ -c $< $(FLAGS)
+	g++ -o $@ -c $< $(FLAGS)
 
 %.o: %.c
-	gcc -g -o $@ -c $< $(FLAGS)
+	gcc -o $@ -c $< $(FLAGS)
 
 all: $(OBJS)
 	g++ -o fire $(OBJS) $(LINKFLAGS)
