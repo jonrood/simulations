@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_thread.h>
+#include <assert.h>
 
 #include "fluid.h"
 #include "viewer.h"
